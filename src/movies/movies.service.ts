@@ -43,7 +43,6 @@ export class MoviesService {
   }
 
   async findOne(term: string) {
-    console.log(term);
     let movie: Movie;
 
     if (isUUID(term)) {
