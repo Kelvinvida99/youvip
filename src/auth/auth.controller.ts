@@ -11,6 +11,8 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-auth.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { Auth } from './decorators/auth.decorator';
+import { ValidRoles } from './interface';
 
 @Controller('auth')
 export class AuthController {
@@ -26,7 +28,8 @@ export class AuthController {
     return this.authService.login(loginUserDto);
   }
 
-  @Get()
+  @Get('getUsers')
+  @Auth(ValidRoles.admin)
   findAll() {
     return this.authService.findAll();
   }
@@ -42,6 +45,7 @@ export class AuthController {
   }
 
   @Delete(':id')
+  @Auth(ValidRoles.admin)
   remove(@Param('id') id: string) {
     return this.authService.remove(id);
   }

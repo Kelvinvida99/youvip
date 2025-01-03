@@ -36,7 +36,7 @@ export class AuthService {
 
       return {
         ...user,
-        token: this.getJwtToken({ id: user.id }),
+        token: this.getJwtToken({ id: user.id, email: user.email }),
       };
       // TODO: Retornar el JWT de acceso
     } catch (error) {
@@ -58,9 +58,11 @@ export class AuthService {
     if (!bcrypt.compareSync(password, user.password))
       throw new UnauthorizedException('Credentials are not valid (password)');
 
+    delete user.password;
+
     return {
       ...user,
-      token: this.getJwtToken({ id: user.id }),
+      token: this.getJwtToken({ id: user.id, email: user.email }),
     };
   }
 
