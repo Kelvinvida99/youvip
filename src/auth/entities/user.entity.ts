@@ -1,8 +1,10 @@
+import { Movie } from '../../movies/entities/movie.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -34,6 +36,9 @@ export class User {
     default: ['user'],
   })
   roles: string[];
+
+  @OneToMany(() => Movie, (movie) => movie.user)
+  movie: Movie;
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {

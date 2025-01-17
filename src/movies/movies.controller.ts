@@ -15,6 +15,8 @@ import { UpdateMovieDto } from './dto/update-movie.dto';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { ValidRoles } from 'src/auth/interface';
+import { GetUser } from '../auth/decorators';
+import { User } from '../auth/entities/user.entity';
 
 @Controller('movies')
 @Auth(ValidRoles.admin)
@@ -22,8 +24,8 @@ export class MoviesController {
   constructor(private readonly moviesService: MoviesService) {}
 
   @Post()
-  create(@Body() createMovieDto: CreateMovieDto) {
-    return this.moviesService.create(createMovieDto);
+  create(@Body() createMovieDto: CreateMovieDto, @GetUser() user: User) {
+    return this.moviesService.create(createMovieDto, user);
   }
 
   @Get()
@@ -40,8 +42,9 @@ export class MoviesController {
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateMovieDto: UpdateMovieDto,
+    @GetUser() user: User,
   ) {
-    return this.moviesService.update(id, updateMovieDto);
+    return this.moviesService.update(id, updateMovieDto, user);
   }
 
   @Delete(':id')

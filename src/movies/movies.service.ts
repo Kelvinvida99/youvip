@@ -12,6 +12,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid';
+import { User } from '../auth/entities/user.entity';
 
 @Injectable()
 export class MoviesService {
@@ -22,9 +23,12 @@ export class MoviesService {
 
   private readonly logger = new Logger('ProductsService');
 
-  async create(createMovieDto: CreateMovieDto) {
+  async create(createMovieDto: CreateMovieDto, user: User): Promise<Movie> {
     try {
-      const movie = this.movieRepository.create(createMovieDto);
+      const movie = this.movieRepository.create({
+        ...createMovieDto,
+        user,
+      });
       await this.movieRepository.save(movie);
 
       return movie;
@@ -33,7 +37,7 @@ export class MoviesService {
     }
   }
 
-  findAll(paginationDto: PaginationDto) {
+  findAll(paginationDto: PaginationDto): Promise<Movie[]> {
     const { limit = 10, offset = 0 } = paginationDto;
 
     return this.movieRepository.find({
@@ -42,7 +46,7 @@ export class MoviesService {
     });
   }
 
-  async findOne(term: string) {
+  async findOne(term: string): Promise<Movie> {
     let movie: Movie;
 
     if (isUUID(term)) {
@@ -61,13 +65,19 @@ export class MoviesService {
     return movie;
   }
 
-  async update(id: string, updateMovieDto: UpdateMovieDto) {
+  async update(
+    id: string,
+    updateMovieDto: UpdateMovieDto,
+    user: User,
+  ): Promise<Movie> {
     const movie = await this.movieRepository.preload({
       id: id,
       ...updateMovieDto,
     });
 
     if (!movie) throw new NotFoundException(`Movie with id ${id} not found`);
+
+    movie.user = user;
 
     try {
       await this.movieRepository.save(movie);
@@ -77,13 +87,13 @@ export class MoviesService {
     }
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<boolean> {
     const movie = await this.findOne(id);
     await this.movieRepository.remove(movie);
     return true;
   }
 
-  private handleDBExceptions(error: any) {
+  private handleDBExceptions(error: any): void {
     if (error.code === '23505') throw new BadRequestException(error.detail);
 
     this.logger.error(error);
