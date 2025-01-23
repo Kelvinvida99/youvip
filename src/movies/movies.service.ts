@@ -21,7 +21,7 @@ export class MoviesService {
     private readonly movieRepository: Repository<Movie>,
   ) {}
 
-  private readonly logger = new Logger('ProductsService');
+  private readonly logger = new Logger('MoviesService');
 
   async create(createMovieDto: CreateMovieDto, user: User): Promise<Movie> {
     try {
@@ -37,10 +37,10 @@ export class MoviesService {
     }
   }
 
-  findAll(paginationDto: PaginationDto): Promise<Movie[]> {
+  async findAll(paginationDto: PaginationDto): Promise<Movie[]> {
     const { limit = 10, offset = 0 } = paginationDto;
 
-    return this.movieRepository.find({
+    return await this.movieRepository.find({
       take: limit,
       skip: offset,
     });
@@ -89,7 +89,11 @@ export class MoviesService {
 
   async remove(id: string): Promise<boolean> {
     const movie = await this.findOne(id);
-    await this.movieRepository.remove(movie);
+    try {
+      await this.movieRepository.remove(movie);
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
     return true;
   }
 

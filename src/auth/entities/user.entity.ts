@@ -1,3 +1,4 @@
+import { Series } from '../../series/entities/series.entity';
 import { Movie } from '../../movies/entities/movie.entity';
 import {
   BeforeInsert,
@@ -39,6 +40,9 @@ export class User {
 
   @OneToMany(() => Movie, (movie) => movie.user)
   movie: Movie;
+
+  @OneToMany(() => Series, (serie) => serie.user)
+  series: Series;
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {

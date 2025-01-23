@@ -13,8 +13,8 @@ import { MoviesService } from './movies.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { PaginationDto } from '../common/dtos/pagination.dto';
-import { Auth } from 'src/auth/decorators/auth.decorator';
-import { ValidRoles } from 'src/auth/interface';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { ValidRoles } from '../auth/interface';
 import { GetUser } from '../auth/decorators';
 import { User } from '../auth/entities/user.entity';
 
