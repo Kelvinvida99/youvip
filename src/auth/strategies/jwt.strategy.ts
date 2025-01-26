@@ -6,13 +6,14 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { JwtPayload } from '../interface/jwt-payload.interface';
+import { AuthService } from '../auth.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-
+    private authService: AuthService,
     configService: ConfigService,
   ) {
     super({
@@ -32,5 +33,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('User is inactive, talk with an admin');
 
     return user;
+  }
+
+  googleValidate(email: string, password: string) {
+    if (password === '')
+      throw new UnauthorizedException('Please Provide The Password');
+    return this.authService.validateUser(email, password);
   }
 }

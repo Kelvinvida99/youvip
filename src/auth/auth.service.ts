@@ -13,6 +13,7 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { JwtPayload } from './interface/jwt-payload.interface';
+import { compare } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -109,6 +110,25 @@ export class AuthService {
   private getJwtToken(payload: JwtPayload) {
     const token = this.jwtService.sign(payload);
     return token;
+  }
+
+  async validateGoogleUser(googleUser: CreateUserDto) {
+    const user = await this.login({
+      email: googleUser.email,
+      password: googleUser.password,
+    });
+    if (user) return user;
+    return this.userRepository.create(googleUser);
+  }
+
+  async validateUser(email: string, password: string) {
+    const user = await this.userRepository.findOneBy({ email });
+    if (!user) throw new UnauthorizedException('User not found!');
+    const isPasswordMatch = await compare(password, user.password);
+    if (!isPasswordMatch)
+      throw new UnauthorizedException('Invalid credentials');
+
+    return { id: user.id };
   }
 
   private handleDBErrors(error: any): never {
